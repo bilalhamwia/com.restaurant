@@ -15,19 +15,19 @@ import java.util.function.Function;
 public class JwtUtil {
 
     //create secret Key
-    private String secret = "restaurantProject";
+    private String secret = "restaurant";
 
     public String extractUsername(String token) {
-        return extractClamis(token, Claims::getSubject);
+        return extractClaims(token, Claims::getSubject);
     }
 
     public Date extractExpiration(String token) {
-        return extractClamis(token, Claims::getExpiration);
+        return extractClaims(token, Claims::getExpiration);
     }
-
-    public <T> T extractClamis(String token, Function<Claims, T> claimResolver){
+    public <T> T extractClaims(String token, Function<Claims, T> claimsResolver){
         final Claims claims = extractAllClaims(token);
-        return claimResolver.apply(claims);
+        //log.info(String.valueOf(claims));
+        return claimsResolver.apply(claims);
     }
 
     public Claims extractAllClaims(String token) {

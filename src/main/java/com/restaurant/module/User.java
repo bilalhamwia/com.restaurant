@@ -1,10 +1,11 @@
-package com.restaurant.POJO;
+package com.restaurant.module;
 
 import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 //@NamedQuery(name = "User.findByEmailId", query = "select u from User u where u.email=:email")
 @Data
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @DynamicUpdate
 @DynamicInsert
 @Table(name = "user")
-public class User {
+public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

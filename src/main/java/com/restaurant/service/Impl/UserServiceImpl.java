@@ -1,12 +1,15 @@
 package com.restaurant.service.Impl;
 
 import com.restaurant.JWT.CustomerUserDetailsService;
+import com.restaurant.JWT.JwtFilter;
 import com.restaurant.JWT.JwtUtil;
-import com.restaurant.POJO.User;
+import com.restaurant.module.User;
 import com.restaurant.constents.RestaurantConstants;
 import com.restaurant.repository.UserRepository;
 import com.restaurant.service.UserService;
 import com.restaurant.utils.RestaurantUtils;
+import com.restaurant.wrapper.UserWrapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,10 +19,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -34,6 +37,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     JwtUtil jwtUtil;
+
+    @Autowired
+    JwtFilter jwtFilter;
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
@@ -57,12 +63,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean validateSignUpMap(Map<String, String> requestMap) {
-       if (requestMap.containsKey("name") && requestMap.containsKey("contactNumber")
-                && requestMap.containsKey("email") && requestMap.containsKey("password"))
-       {
-           return true;
-       }
-       return false;
+        return requestMap.containsKey("name")
+                && requestMap.containsKey("contactNumber")
+                && requestMap.containsKey("email")
+                && requestMap.containsKey("password");
     }
 
     private User getUserFromMap(Map<String, String> requestMap) {
@@ -93,5 +97,37 @@ public class UserServiceImpl implements UserService {
             log.error("{}", exception);
         }
         return new ResponseEntity<String>("{\"message\":\""+"Bad credentials." + "\"}", HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public ResponseEntity<List<UserWrapper>> getAllUser() {
+        try {
+            if(jwtFilter.isAdmin())  {
+                return new ResponseEntity<>(userRepository.getAllUser(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> update(Map<String, String> requestMap) {
+        try {
+            if(jwtFilter.isAdmin()){
+                Optional<User> user = userRepository.findById(Integer.parseInt(requestMap.get("id")));
+                if(user.isPresent()){
+                    userRepository.updateStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
+                    return RestaurantUtils.getResponseEntity("User status updated successfully", HttpStatus.OK);
+                } else {
+                    return RestaurantUtils.getResponseEntity("User id does not exist", HttpStatus.NO_CONTENT);
+                }
+            } else return RestaurantUtils.getResponseEntity(RestaurantConstants.UNAUTHORIZED_ACCESS,HttpStatus.UNAUTHORIZED);
+        } catch (Exception exception){
+            exception.printStackTrace();
+        }
+        return RestaurantUtils.getResponseEntity(RestaurantConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
