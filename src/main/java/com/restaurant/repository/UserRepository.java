@@ -18,6 +18,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("select new com.restaurant.wrapper.UserWrapper(u.id, u.name, u.email, u.contactNumber, u.status) from User u where u.role='user'")
     List<UserWrapper> getAllUser();
 
+    @Query("select u.email from User u where u.role='admin'")
+    List<String> getAllAdmin();
     @Transactional
     @Modifying
     @Query("update User u set u.status=:status where u.id=:id")

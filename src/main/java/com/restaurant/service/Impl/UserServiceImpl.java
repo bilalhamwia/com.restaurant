@@ -7,6 +7,7 @@ import com.restaurant.module.User;
 import com.restaurant.constents.RestaurantConstants;
 import com.restaurant.repository.UserRepository;
 import com.restaurant.service.UserService;
+import com.restaurant.utils.EmailUtils;
 import com.restaurant.utils.RestaurantUtils;
 import com.restaurant.wrapper.UserWrapper;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     JwtFilter jwtFilter;
+
+    @Autowired
+    EmailUtils emailUtils;
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
@@ -120,6 +124,7 @@ public class UserServiceImpl implements UserService {
                 Optional<User> user = userRepository.findById(Integer.parseInt(requestMap.get("id")));
                 if(user.isPresent()){
                     userRepository.updateStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
+                    sendMailToAllAdmin(requestMap.get("status"), user.get().getEmail(), userRepository.getAllAdmin());
                     return RestaurantUtils.getResponseEntity("User status updated successfully", HttpStatus.OK);
                 } else {
                     return RestaurantUtils.getResponseEntity("User id does not exist", HttpStatus.NO_CONTENT);
@@ -129,5 +134,15 @@ public class UserServiceImpl implements UserService {
             exception.printStackTrace();
         }
         return RestaurantUtils.getResponseEntity(RestaurantConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private void sendMailToAllAdmin(String status, String user, List<String> allAdmin) {
+        allAdmin.remove(jwtFilter.getCurrentUser());
+        if (status != null && status.equalsIgnoreCase("true")) {
+            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Approved", "User:- "+user+"\n is approved by \nADMIN:-" + jwtFilter.getCurrentUser(), allAdmin);
+        } else {
+            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Disabled", "User:- "+user+"\n is Disabled by \nADMIN:-" + jwtFilter.getCurrentUser(), allAdmin);
+
+        }
     }
 }
