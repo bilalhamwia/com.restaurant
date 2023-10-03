@@ -12,6 +12,7 @@ import com.restaurant.utils.RestaurantUtils;
 import com.restaurant.wrapper.UserWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -144,5 +145,42 @@ public class UserServiceImpl implements UserService {
             emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Disabled", "User:- "+user+"\n is Disabled by \nADMIN:-" + jwtFilter.getCurrentUser(), allAdmin);
 
         }
+    }
+
+    @Override
+    public ResponseEntity<String> checkToken() {
+        return RestaurantUtils.getResponseEntity("true", HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
+        try {
+            User user = userRepository.findByEmail(jwtFilter.getCurrentUser());
+            if (!user.equals(null)) {
+                if (user.getPassword().equals(requestMap.get("oldPassword"))) {
+                    user.setPassword(requestMap.get("newPassword"));
+                    userRepository.save(user);
+                    return RestaurantUtils.getResponseEntity("Password Update Successfully", HttpStatus.OK);
+                }
+                return RestaurantUtils.getResponseEntity("Incorrect old Password", HttpStatus.BAD_REQUEST);
+            }
+            return RestaurantUtils.getResponseEntity(RestaurantConstants.INVALID_DATA, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        return RestaurantUtils.getResponseEntity(RestaurantConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> forgotPassword(Map<String, String> requestMap) {
+        try {
+            User user = userRepository.findByEmail(requestMap.get("email"));
+            if(!Objects.isNull(user) && !Strings.isBlank(user.getEmail()))
+                emailUtils.forgotPassword(user.getEmail(), "Credentials by cafe Management System", user.getPassword());
+                return RestaurantUtils.getResponseEntity("Check your mail for Credentials", HttpStatus.OK);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        return RestaurantUtils.getResponseEntity(RestaurantConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
