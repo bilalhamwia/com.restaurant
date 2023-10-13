@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -78,5 +79,30 @@ public class CategoryServiceImpl implements CategoryService {
             ex.printStackTrace();
         }
         return new ResponseEntity<List<Category>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> updateCategory(Map<String, String> requestMap) {
+        try {
+            if (jwtFilter.isAdmin()) {
+                if (validateCategoryMap(requestMap, true)) {
+                    Optional<Category> optional = categoryRepository.findById(Integer.parseInt(requestMap.get("id")));
+                    if (optional.isPresent()) {
+                        categoryRepository.save(getCategoryFromMap(requestMap, true));
+                        return RestaurantUtils.getResponseEntity("Category updated Successfully", HttpStatus.OK);
+                    }
+                    else {
+                        return RestaurantUtils.getResponseEntity("Category id does not exist", HttpStatus.OK);
+                    }
+                }
+                return RestaurantUtils.getResponseEntity(RestaurantConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
+            }
+            else {
+                return RestaurantUtils.getResponseEntity(RestaurantConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return RestaurantUtils.getResponseEntity(RestaurantConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
