@@ -2,7 +2,7 @@ package com.restaurant.controller.controllerImpl;
 
 import com.restaurant.constents.RestaurantConstants;
 import com.restaurant.controller.CategoryController;
-import com.restaurant.module.Category;
+import com.restaurant.Entity.Category;
 import com.restaurant.service.CategoryService;
 import com.restaurant.utils.RestaurantUtils;
 import org.springframework.beans.factory.annotation.Autowired;

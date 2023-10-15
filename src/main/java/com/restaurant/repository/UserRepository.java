@@ -1,6 +1,6 @@
 package com.restaurant.repository;
 
-import com.restaurant.module.User;
+import com.restaurant.Entity.User;
 import com.restaurant.wrapper.UserWrapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

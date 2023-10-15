@@ -3,7 +3,7 @@ package com.restaurant.service.Impl;
 import com.google.common.base.Strings;
 import com.restaurant.JWT.JwtFilter;
 import com.restaurant.constents.RestaurantConstants;
-import com.restaurant.module.Category;
+import com.restaurant.Entity.Category;
 import com.restaurant.repository.CategoryRepository;
 import com.restaurant.service.CategoryService;
 import com.restaurant.utils.RestaurantUtils;

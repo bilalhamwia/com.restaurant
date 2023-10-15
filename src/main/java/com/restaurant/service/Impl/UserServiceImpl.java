@@ -3,7 +3,7 @@ package com.restaurant.service.Impl;
 import com.restaurant.JWT.CustomerUserDetailsService;
 import com.restaurant.JWT.JwtFilter;
 import com.restaurant.JWT.JwtUtil;
-import com.restaurant.module.User;
+import com.restaurant.Entity.User;
 import com.restaurant.constents.RestaurantConstants;
 import com.restaurant.repository.UserRepository;
 import com.restaurant.service.UserService;

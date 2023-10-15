@@ -1,4 +1,4 @@
-package com.restaurant.module;
+package com.restaurant.Entity;
 
 import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;

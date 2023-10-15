@@ -1,6 +1,6 @@
 package com.restaurant.controller;
 
-import com.restaurant.module.Category;
+import com.restaurant.Entity.Category;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

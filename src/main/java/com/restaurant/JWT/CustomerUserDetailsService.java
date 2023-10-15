@@ -1,6 +1,6 @@
 package com.restaurant.JWT;
 
-import com.restaurant.module.User;
+import com.restaurant.Entity.User;
 import com.restaurant.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
