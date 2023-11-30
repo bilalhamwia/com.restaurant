@@ -7,12 +7,16 @@ import com.restaurant.constents.RestaurantConstants;
 import com.restaurant.repository.ProductRepository;
 import com.restaurant.service.ProductService;
 import com.restaurant.utils.RestaurantUtils;
+import com.restaurant.wrapper.ProductWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -68,5 +72,41 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(requestMap.get("description"));
         product.setPrice(Integer.parseInt(requestMap.get("price")));
         return product;
+    }
+
+    @Override
+    public ResponseEntity<List<ProductWrapper>> getAllProduct() {
+        try {
+            return new ResponseEntity<>(productRepository.getAllProduct(), HttpStatus.OK);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> updateProduct(Map<String, String> requestMap) {
+        try {
+            if (jwtFilter.isAdmin()) {
+                if (ValidatedProductMap(requestMap, true)){
+                    Optional<Product> optional = productRepository.findById(Integer.parseInt(requestMap.get("id")));
+                    if (optional.isPresent()) {
+                        Product product = getProductFromMap(requestMap, true);
+                        product.setStatus(optional.get().getStatus());
+                        productRepository.save(product);
+                        return RestaurantUtils.getResponseEntity("Product updated Successfully", HttpStatus.OK);
+                    } else {
+                        return RestaurantUtils.getResponseEntity("Product is does not exist.", HttpStatus.OK);
+                    }
+                } else {
+                    return RestaurantUtils.getResponseEntity(RestaurantConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                return RestaurantUtils.getResponseEntity(RestaurantConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return RestaurantUtils.getResponseEntity(RestaurantConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
