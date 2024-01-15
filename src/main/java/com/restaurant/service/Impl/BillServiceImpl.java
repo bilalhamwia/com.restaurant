@@ -47,7 +47,7 @@ public class BillServiceImpl implements BillService {
                     insertBill(requestMap);
                 }
 
-                String data = "Name: " + requestMap.get("name") + "\n" + "Contract Number: " + requestMap.get("contactNumber") +
+                String data = "Name: " + requestMap.get("name") + "\n" + "Contact Number: " + requestMap.get("contactNumber") +
                         "\n" + "Email: " +requestMap.get("email") + "\n" + "Payment Method: " +requestMap.get("paymentMethod");
 
                 //create file and location
@@ -148,7 +148,7 @@ public class BillServiceImpl implements BillService {
             bill.setUuid((String) requestMap.get("uuid"));
             bill.setName((String) requestMap.get("name"));
             bill.setEmail((String) requestMap.get("email"));
-            bill.setContactNumber((String) requestMap.get("contractNumber"));
+            bill.setContactNumber((String) requestMap.get("contactNumber"));
             bill.setPaymentMethod((String) requestMap.get("paymentMethod"));
             bill.setTotal(Integer.parseInt((String) requestMap.get("totalAmount")));
             bill.setProductDetail((String) requestMap.get("productDetails"));
